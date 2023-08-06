@@ -1,5 +1,6 @@
 package com.allianz.erpsystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -31,9 +32,7 @@ public class Order {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @Enumerated(EnumType.STRING)
-    private ApprovalStatementEnum approvalStatement;
-
+    private int approvalStatement;
 
     @OneToOne
     @JoinColumn(name = "invoice_id")
@@ -42,6 +41,7 @@ public class Order {
 
     @OneToMany(targetEntity = Product.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     private ArrayList<Product> product;
 
 

@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -36,5 +37,5 @@ public class InvoiceEntity extends BaseEntity {
     @Column
     @OneToMany(targetEntity = ProductEntity.class,cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
-    private ArrayList<ProductEntity> productEntity;
+    private List<ProductEntity> productEntity;
 }

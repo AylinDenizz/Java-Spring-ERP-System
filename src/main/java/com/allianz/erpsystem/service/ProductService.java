@@ -46,7 +46,7 @@ public class ProductService {
     }
 
     public ProductEntity getProductByProductNumber(String productNumber) {
-        Optional<ProductEntity> productEntityOptional = productRepository.findByProductNumber(productNumber);
+        Optional<ProductEntity> productEntityOptional = productRepository.findProductEntityByProductNumber(productNumber);
         if (productEntityOptional.isPresent()) {
             return productEntityOptional.get();
         } else {
@@ -59,7 +59,7 @@ public class ProductService {
         ProductEntity productEntity = getProductByProductNumber(productNumber);
 
         if (productEntity != null) {
-            productRepository.deleteByProductNumber(productNumber);
+            productRepository.deleteProductEntityByProductNumber(productNumber);
             return true;
         } else {
             return false;

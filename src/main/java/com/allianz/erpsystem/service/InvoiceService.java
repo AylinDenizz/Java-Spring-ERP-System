@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -32,7 +33,7 @@ public class InvoiceService {
     }
 
     public InvoiceEntity createInvoice( BigDecimal totalPrice, BigDecimal kdvAddedTotalPrice,
-                                       OrderEntity orderEntity, ArrayList<ProductEntity> productEntities) {
+                                       OrderEntity orderEntity, List<ProductEntity> productEntities) {
 
         String newInvoiceNumber = "INV" + generateUniqueInvoiceNumber();
 
@@ -49,7 +50,7 @@ public class InvoiceService {
     }
 
     public InvoiceEntity getInvoiceByOrderEntity(OrderEntity orderEntity) {
-        Optional<InvoiceEntity> invoiceEntityOptional = invoiceRepository.findByOrderEntity(orderEntity);
+        Optional<InvoiceEntity> invoiceEntityOptional = invoiceRepository.findInvoiceEntityByOrderEntity(orderEntity);
         if (invoiceEntityOptional.isPresent()) {
             return invoiceEntityOptional.get();
         } else {

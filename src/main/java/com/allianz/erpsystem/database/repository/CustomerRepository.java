@@ -11,8 +11,11 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
 
-    Optional<CustomerEntity> findByCustomerNumber(String key);
+    Optional<CustomerEntity> findCustomerEntitiesByCustomerNumber(String customerNumber);
+    Optional<CustomerEntity> findByCustomerNumber(String customerNumber);
+    Optional<CustomerEntity> findCustomerEntityByCustomerNumber(String customerNumber);
+
     @Modifying
-    void deleteByCustomerNumber(String key);
+    void deleteCustomerEntityByCustomerNumber(String customerNumber);
 
 }

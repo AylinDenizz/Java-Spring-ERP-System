@@ -1,10 +1,7 @@
 package com.allianz.erpsystem.database.entity;
 
 import com.allianz.erpsystem.util.dbutil.BaseEntity;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -30,6 +27,9 @@ public class ProductEntity extends BaseEntity {
     private int stockAmount;
     @Column
     private BigDecimal unitPrice;
+
+    @ManyToOne
+    private OrderEntity orderEntity;
 
 
 }

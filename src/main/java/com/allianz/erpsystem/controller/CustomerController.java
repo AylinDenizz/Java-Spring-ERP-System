@@ -59,7 +59,7 @@ public class CustomerController {
 
 
     @GetMapping("customer-get-by-customer-number/{customerNumber}")
-    public ResponseEntity<CustomerEntity> getCustomerByCustomerNumber(@PathVariable String customerNumber) {
+    public ResponseEntity<CustomerEntity> getCustomer(@PathVariable String customerNumber) {
         CustomerEntity customerEntity = customerService.getCustomerByCustomerNumber(customerNumber);
         return new ResponseEntity<>(customerEntity, HttpStatus.OK);
     }

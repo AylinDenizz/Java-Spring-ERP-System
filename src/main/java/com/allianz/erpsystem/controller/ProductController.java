@@ -67,9 +67,13 @@ public class ProductController {
                                                             @RequestBody BigDecimal productPrice) {
 
         ProductEntity productEntity1 = productService.getProductByProductNumber(productNumber);
+        if (productEntity1 != null) {
         productEntity1.setUnitPrice(productPrice);
         productService.updateProduct(productEntity1);
-        return new ResponseEntity<>(productEntity1, HttpStatus.OK);
+        return new ResponseEntity<>(productEntity1, HttpStatus.OK);}
+        else{
+            System.out.println("there is no such thing has a product number like this.");
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);}
 
     }
 

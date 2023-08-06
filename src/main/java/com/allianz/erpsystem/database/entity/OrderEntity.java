@@ -8,10 +8,7 @@ import com.allianz.erpsystem.util.dbutil.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table
@@ -28,7 +25,7 @@ public class OrderEntity extends BaseEntity {
     @Column
     private String orderNumber;
 
-    @OneToOne
+    @ManyToOne
     @PrimaryKeyJoinColumn
     @JoinColumn(name = "customer_id")
     private CustomerEntity customerEntity;
@@ -40,13 +37,12 @@ public class OrderEntity extends BaseEntity {
     private InvoiceEntity invoiceEntity;
 
     @Column
-    @OneToMany(targetEntity = ProductEntity.class, cascade = CascadeType.ALL)
+    @OneToMany
     @JoinColumn(name = "product_id")
-    private ArrayList<ProductEntity> productEntities;
+    private List<ProductEntity> productEntities;
 
 
     @Column
-    @Enumerated(EnumType.STRING)
-    private ApprovalStatementEnum approvalStatement;
+    private int approvalStatement;
 
 }

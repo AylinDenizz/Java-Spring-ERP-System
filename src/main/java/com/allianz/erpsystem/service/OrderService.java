@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -29,17 +30,17 @@ public class OrderService {
 
 
     public OrderEntity createOrder(int orderAmount, CustomerEntity customerEntity,
-                                   ApprovalStatementEnum approvalStatementEnum, InvoiceEntity invoiceEntity,
-                                   ArrayList<ProductEntity> productEntities) {
+                                   int approvalStatementEnum,
+                                   List<ProductEntity> productEntities) {
         String newOrderNumber = "ORD" + generateUniqueOrderNumber();
 
         OrderEntity order = new OrderEntity();
         order.setOrderAmount(orderAmount);
         order.setProductEntities(productEntities);
-        order.setInvoiceEntity(invoiceEntity);
         order.setCustomerEntity(customerEntity);
         order.setApprovalStatement(approvalStatementEnum);
         order.setOrderNumber(newOrderNumber);
+        order.setInvoiceEntity(null);
 
         orderRepository.save(order);
 
@@ -48,7 +49,16 @@ public class OrderService {
 
     public OrderEntity getOrderByOrderNumber(String orderNumber) {
         Optional<OrderEntity> orderEntityOptional = orderRepository.findByOrderNumber(orderNumber);
-        if (orderEntityOptional.isPresent()) {
+        Optional<OrderEntity> orderEntityOptional2 = orderRepository.findOrderEntitiesByOrderNumber(orderNumber);
+        Optional<OrderEntity> orderEntityOptional3= orderRepository.findOrderEntityByOrderNumber(orderNumber);
+        System.out.println(orderEntityOptional.get().toString());
+        System.out.println(orderEntityOptional2.get().toString());
+        System.out.println(orderEntityOptional3.get().toString());
+
+
+
+
+        if (orderEntityOptional3.isPresent()) {
             return orderEntityOptional.get();
         } else {
             return null;
@@ -59,7 +69,7 @@ public class OrderService {
         OrderEntity orderEntity1 = getOrderByOrderNumber(orderEntity.getOrderNumber());
         if (orderEntity1 != null) {
 
-            orderEntity1.setApprovalStatement(approvalStatementEnum);
+            orderEntity1.setApprovalStatement(approvalStatementEnum.getValue());
 
             orderRepository.save(orderEntity1);
 

@@ -14,9 +14,9 @@ import java.util.UUID;
 @Repository
 public interface ProductRepository extends JpaRepository <ProductEntity, Long> {
 
-    Optional<ProductEntity> findByProductNumber(String key);
+    Optional<ProductEntity> findProductEntityByProductNumber(String key);
     @Modifying
-    void deleteByProductNumber(String productNumber);
+    void deleteProductEntityByProductNumber(String productNumber);
 
 }
 

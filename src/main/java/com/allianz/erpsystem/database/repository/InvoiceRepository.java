@@ -11,5 +11,5 @@ import java.util.Optional;
 @Repository
 public interface InvoiceRepository extends JpaRepository<InvoiceEntity, Long> {
 
-    Optional<InvoiceEntity> findByOrderEntity(OrderEntity orderEntity);
+    Optional<InvoiceEntity> findInvoiceEntityByOrderEntity(OrderEntity orderEntity);
 }

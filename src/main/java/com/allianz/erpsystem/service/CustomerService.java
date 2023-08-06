@@ -33,7 +33,11 @@ public class CustomerService {
         CustomerEntity customer = new CustomerEntity();
         customer.setCustomerName(customerName);
         customer.setCustomerAddress(customerAddress);
-        customer.setOrderCount(customer.getOrderEntities().size());
+        if (customer.getOrderEntities() != null) {
+            customer.setOrderCount(customer.getOrderEntities().size());
+        }else {
+            customer.setOrderCount(0);
+        }
         customer.setCustomerNumber(newCustomerNumber);
 
         customerRepository.save(customer);
@@ -53,7 +57,7 @@ public class CustomerService {
     }
 
     public CustomerEntity getCustomerByCustomerNumber(String customerNumber) {
-        Optional<CustomerEntity> customerEntityOptional = customerRepository.findByCustomerNumber(customerNumber);
+        Optional<CustomerEntity> customerEntityOptional = customerRepository.findCustomerEntityByCustomerNumber(customerNumber);
         if (customerEntityOptional.isPresent()) {
             return customerEntityOptional.get();
         } else {
@@ -67,7 +71,7 @@ public class CustomerService {
         CustomerEntity customerEntity = getCustomerByCustomerNumber(customerNumber);
 
         if (customerEntity != null) {
-            customerRepository.deleteByCustomerNumber(customerNumber);
+            customerRepository.deleteCustomerEntityByCustomerNumber(customerNumber);
             return true;
         } else {
             return false;

@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -30,7 +31,7 @@ public class CustomerEntity extends BaseEntity {
 
     @Column
     @OneToMany(targetEntity =OrderEntity.class, cascade = CascadeType.ALL)
-    private ArrayList<OrderEntity> orderEntities;
+    private List<OrderEntity> orderEntities = null;
 
 
 
