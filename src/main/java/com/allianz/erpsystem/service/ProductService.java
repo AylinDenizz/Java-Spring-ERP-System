@@ -59,18 +59,6 @@ public class ProductService {
         }
     }
 
-    @Transactional
-    public Boolean deleteProductByProductNumber( Long id ) {
-        ProductEntity productEntity = getProductByProductNumber(id);
-
-        if (productEntity != null) {
-            productRepository.deleteProductEntitiesById(id);
-            return true;
-        } else {
-            return false;
-        }
-
-    }
 
     @Transactional
     public Boolean deleteProductById(Long id) {

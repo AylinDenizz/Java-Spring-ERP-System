@@ -27,8 +27,5 @@ public class ProductEntity extends BaseEntity {
     @Column
     private BigDecimal unitPrice;
 
-    @ManyToOne(targetEntity = OrderEntity.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private OrderEntity orderEntity;
-
 
 }

@@ -31,13 +31,13 @@ public class ProductController {
 
     }
 
-    @GetMapping("product-get-by-product-number/{productNumber}")
+    @GetMapping("product-get-by-Id/{id}")
     public ResponseEntity<ProductEntity> getProductById(@PathVariable Long id) {
         ProductEntity productEntity1 = productService.getProductById(id);
         return new ResponseEntity<>(productEntity1, HttpStatus.OK);
     }
 
-    @PutMapping("update-product-by-product-name/{productNumber}")
+    @PutMapping("update-product-by-Id/{id}")
     public ResponseEntity<ProductEntity> updateProductById(@PathVariable Long id,
                                                             @RequestBody ProductEntity newProductEntity) {
         ProductEntity productEntity1 = productService.getProductById(id);
