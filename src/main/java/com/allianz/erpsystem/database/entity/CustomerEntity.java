@@ -21,17 +21,16 @@ import java.util.UUID;
 )
 @Data
 public class CustomerEntity extends BaseEntity {
-    @Column
-    private String customerName;
+
     @Column
     private String customerAddress;
     @Column
-    private String customerNumber;
+    private String customerName;
     @Column
     private int orderCount;
 
     @Column
-    @OneToMany(targetEntity =OrderEntity.class, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customerEntity" ,targetEntity =OrderEntity.class, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<OrderEntity> orderEntities = null;
 

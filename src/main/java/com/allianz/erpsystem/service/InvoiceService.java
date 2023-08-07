@@ -28,17 +28,12 @@ public class InvoiceService {
 
     // random unique Invoice number is created
 
-    public int generateUniqueInvoiceNumber() {
-        return (int) invoiceNumberGenerator.incrementAndGet();
-    }
 
     public InvoiceEntity createInvoice(BigDecimal totalPrice, BigDecimal kdvAddedTotalPrice,
                                        OrderEntity orderEntity, List<ProductEntity> productEntities) {
 
-        String newInvoiceNumber = "INV" + generateUniqueInvoiceNumber();
 
         InvoiceEntity invoice = new InvoiceEntity();
-        invoice.setInvoiceNumber(newInvoiceNumber);
         invoice.setOrderEntity(orderEntity);
         invoice.setProductEntity(productEntities);
         invoice.setTotalPrice(totalPrice);
@@ -58,8 +53,8 @@ public class InvoiceService {
         }
     }
 
-    public InvoiceEntity getInvoiceByInvoiceNumber(String invoiceNumber) {
-        Optional<InvoiceEntity> invoiceEntityOptional = invoiceRepository.findInvoiceEntityByInvoiceNumber(invoiceNumber);
+    public InvoiceEntity getInvoiceById(Long id) {
+        Optional<InvoiceEntity> invoiceEntityOptional = invoiceRepository.findInvoiceEntityById(id);
         if (invoiceEntityOptional.isPresent()) {
             return invoiceEntityOptional.get();
         } else {

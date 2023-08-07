@@ -5,27 +5,21 @@ import com.allianz.erpsystem.database.entity.InvoiceEntity;
 import com.allianz.erpsystem.database.entity.OrderEntity;
 import com.allianz.erpsystem.database.entity.ProductEntity;
 import com.allianz.erpsystem.database.repository.OrderRepository;
-import com.allianz.erpsystem.database.repository.ProductRepository;
 import com.allianz.erpsystem.model.ApprovalStatementEnum;
 import com.allianz.erpsystem.model.Order;
-import com.allianz.erpsystem.model.Product;
 import com.allianz.erpsystem.model.dto.OrderRequestDTO;
 import com.allianz.erpsystem.service.CustomerService;
 import com.allianz.erpsystem.service.InvoiceService;
 import com.allianz.erpsystem.service.OrderService;
 import com.allianz.erpsystem.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 
 @RestController
@@ -46,9 +40,9 @@ public class OrderController {
     @Autowired
     ProductService productService;
 
-    @GetMapping("get-order-by-order-number/{orderNumber}")
-    public ResponseEntity<OrderEntity> getOrder(@PathVariable String orderNumber) {
-        OrderEntity order1 = orderService.getOrderByOrderNumber(orderNumber);
+    @GetMapping("get-order-by-id/{id}")
+    public ResponseEntity<OrderEntity> getOrder(@PathVariable Long id) {
+        OrderEntity order1 = orderService.getOrderById(id);
         return new ResponseEntity<>(order1, HttpStatus.OK);
 
     }
@@ -58,16 +52,16 @@ public class OrderController {
     public ResponseEntity<OrderEntity> createOrder(@RequestBody OrderRequestDTO orderRequest) {
 //Calling all the parameteres in the entity was too hard. So created a order request dto and implemented the metot.
         int orderAmount = orderRequest.getOrderAmount();
-        String customerNumber = orderRequest.getCustomerNumber();
-        List<String> productNumbers = orderRequest.getProductNumbers();
+        Long customer_id = orderRequest.getCustomer_id();
+        List<Long> productIds = orderRequest.getProduct_idList();
 
 
-        CustomerEntity customer = customerService.getCustomerByCustomerNumber(customerNumber);
+        CustomerEntity customer = customerService.getCustomerById(customer_id);
 
         List<ProductEntity> productEntityList = new ArrayList<>();
 
-        for (String productNumber : productNumbers) {
-            ProductEntity product = productService.getProductByProductNumber(productNumber);
+        for (Long productID : productIds) {
+            ProductEntity product = productService.getProductById(productID);
             productEntityList.add(product);
         }
 
@@ -88,11 +82,11 @@ public class OrderController {
     }
 
 
-    @PutMapping("approve-order-and-create-invoice/{orderNumber}")
-    public ResponseEntity<InvoiceEntity> approveOrderAndCreateInvoice(@PathVariable String orderNumber) {
+    @PutMapping("approve-order-and-create-invoice/by-id/{id}")
+    public ResponseEntity<InvoiceEntity> approveOrderAndCreateInvoice(@PathVariable Long id) {
         // getting order by orderNumber and update it's approval statement.
 
-        OrderEntity orderEntity1 = orderService.getOrderByOrderNumber(orderNumber);
+        OrderEntity orderEntity1 = orderService.getOrderById(id);
 
         InvoiceEntity invoice1 = new InvoiceEntity();
 
@@ -116,15 +110,13 @@ public class OrderController {
             //  return new ResponseEntity<>(null, HttpStatus.NOT_FOUND); // already created invoice will find.
         } else if (orderEntity1.getApprovalStatement() == 1) {
 
-            orderService.approvalStatementChangeOrder(orderEntity1, ApprovalStatementEnum.APPROVED);
-
             //total price and tax rate added.
             BigDecimal totalPrice = new BigDecimal(0);
             BigDecimal kdvAddedTotalPrice = new BigDecimal(0);
+            List<ProductEntity> productEntities = orderEntity1.getProductEntities();
 
             // created a loop for calculate kdv settings and check for stock amount for all products.
-            for (ProductEntity product : orderService.getOrderByOrderNumber(orderNumber
-            ).getProductEntities()) {
+            for (ProductEntity product : productEntities) {
 
                 /* in this row, it is examined the stock amount of product. If there is enough product,
                  the product stock amount decresed as the order amount.
@@ -158,6 +150,8 @@ public class OrderController {
                             divide(new BigDecimal(100))));
                 }
 
+                orderService.approvalStatementChangeOrder(orderEntity1, ApprovalStatementEnum.APPROVED);
+
 
                 // If the order status is "Approved" here, a new invoice will be created.
                 invoice1 = invoiceService.createInvoice(totalPrice, kdvAddedTotalPrice,
@@ -173,22 +167,22 @@ public class OrderController {
     }
 // update metotu oluşturulacak ve kargoda veya satış tamamlandı aşamaları güncellenebilecek. Ama diğer şeyler değiştirilemeyecek.
 
-    @PutMapping("make-sale-completed/{orderNumber}")
-    public ResponseEntity<OrderEntity> makeSaleCompleted(@PathVariable String orderNumber) {
-        // getting order by orderNumber and update it's approval statement as SALE_COMPLETED
+    @PutMapping("make-sale-completed-by-id/{id}")
+    public ResponseEntity<OrderEntity> makeSaleCompleted(@PathVariable Long id) {
+        // getting order by id and update it's approval statement as SALE_COMPLETED
 
-        OrderEntity orderEntity1 = orderService.getOrderByOrderNumber(orderNumber);
+        OrderEntity orderEntity1 = orderService.getOrderById(id);
         orderService.approvalStatementChangeOrder(orderEntity1, ApprovalStatementEnum.SALE_COMPLETED);
 
         return new ResponseEntity<>(orderEntity1, HttpStatus.OK);
 
     }
 
-    @PutMapping("transfer-order/{orderNumber}")
-    public ResponseEntity<OrderEntity> changeApprovalAsTransferstate(@PathVariable String orderNumber) {
-        // getting order by orderNumber and update it's approval statement as TRANSFERSTATE
+    @PutMapping("transfer-order-by-id/{id}")
+    public ResponseEntity<OrderEntity> changeApprovalAsTransferstate(@PathVariable Long id) {
+        // getting order by id and update it's approval statement as TRANSFERSTATE
 
-        OrderEntity orderEntity1 = orderService.getOrderByOrderNumber(orderNumber);
+        OrderEntity orderEntity1 = orderService.getOrderById(id);
         orderService.approvalStatementChangeOrder(orderEntity1, ApprovalStatementEnum.TRANSFERSTATE);
         return new ResponseEntity<>(orderEntity1, HttpStatus.OK);
 

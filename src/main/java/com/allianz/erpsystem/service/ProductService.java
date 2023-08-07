@@ -21,17 +21,12 @@ public class ProductService {
     // random unique Product number is created
     private static final AtomicLong productNumberGenerator = new AtomicLong(0);
 
-    public int generateUniqueProductNumber() {
-        return (int) productNumberGenerator.incrementAndGet();
-    }
     public ProductEntity createProduct( String productName, int stockAmount, BigDecimal price,
                                        String productType) {
-        String newProductNumber = "PRO" + generateUniqueProductNumber();
 
         ProductEntity product =new ProductEntity();
         product.setProductName(productName);
         product.setStockAmount(stockAmount);
-        product.setProductNumber(newProductNumber);
         product.setUnitPrice(price);
         product.setProductType(productType);
 
@@ -45,8 +40,18 @@ public class ProductService {
 
     }
 
-    public ProductEntity getProductByProductNumber(String productNumber) {
-        Optional<ProductEntity> productEntityOptional = productRepository.findProductEntityByProductNumber(productNumber);
+    public ProductEntity getProductByProductNumber(Long id) {
+        Optional<ProductEntity> productEntityOptional = productRepository.findProductEntityById(id);
+        if (productEntityOptional.isPresent()) {
+            return productEntityOptional.get();
+        } else {
+            return null;
+        }
+    }
+
+
+    public ProductEntity getProductById(Long id) {
+        Optional<ProductEntity> productEntityOptional = productRepository.findProductEntityById(id);
         if (productEntityOptional.isPresent()) {
             return productEntityOptional.get();
         } else {
@@ -55,11 +60,24 @@ public class ProductService {
     }
 
     @Transactional
-    public Boolean deleteProductByProductNumber(String productNumber) {
-        ProductEntity productEntity = getProductByProductNumber(productNumber);
+    public Boolean deleteProductByProductNumber( Long id ) {
+        ProductEntity productEntity = getProductByProductNumber(id);
 
         if (productEntity != null) {
-            productRepository.deleteProductEntityByProductNumber(productNumber);
+            productRepository.deleteProductEntitiesById(id);
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    @Transactional
+    public Boolean deleteProductById(Long id) {
+        ProductEntity productEntity = getProductById(id);
+
+        if (productEntity != null) {
+            productRepository.deleteProductEntitiesById(id);
             return true;
         } else {
             return false;

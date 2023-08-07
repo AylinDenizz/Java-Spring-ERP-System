@@ -7,8 +7,8 @@ import java.util.List;
 @Data
 public class OrderRequestDTO {
     private int orderAmount;
-    private String customerNumber;
-    private List<String> productNumbers;
+    private Long customer_id;
+    private List<Long> product_idList;
 
     // getter ve setter metods
 }

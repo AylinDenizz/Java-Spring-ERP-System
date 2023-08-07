@@ -13,6 +13,6 @@ public interface InvoiceRepository extends JpaRepository<InvoiceEntity, Long> {
 
     Optional<InvoiceEntity> findInvoiceEntityByOrderEntity(OrderEntity orderEntity);
 
-    Optional<InvoiceEntity> findInvoiceEntityByInvoiceNumber(String key);
+    Optional<InvoiceEntity> findInvoiceEntityById(Long id);
 
 }

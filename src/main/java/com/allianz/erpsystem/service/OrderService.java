@@ -39,7 +39,6 @@ public class OrderService {
         order.setProductEntities(productEntities);
         order.setCustomerEntity(customerEntity);
         order.setApprovalStatement(approvalStatementEnum);
-        order.setOrderNumber(newOrderNumber);
         order.setInvoiceEntity(null);
 
         orderRepository.save(order);
@@ -47,12 +46,8 @@ public class OrderService {
         return order;
     }
 
-    public OrderEntity getOrderByOrderNumber(String orderNumber) {
-        Optional<OrderEntity> orderEntityOptional3= orderRepository.findOrderEntityByOrderNumber(orderNumber);
-
-
-
-
+    public OrderEntity getOrderById(Long id) {
+        Optional<OrderEntity> orderEntityOptional3= orderRepository.findOrderEntityById(id);
 
 
         if (orderEntityOptional3.isPresent()) {
@@ -63,7 +58,7 @@ public class OrderService {
     }
 
     public OrderEntity approvalStatementChangeOrder(OrderEntity orderEntity, ApprovalStatementEnum approvalStatementEnum) {
-        OrderEntity orderEntity1 = getOrderByOrderNumber(orderEntity.getOrderNumber());
+        OrderEntity orderEntity1 = getOrderById(orderEntity.getId());
         if (orderEntity1 != null) {
 
             orderEntity1.setApprovalStatement(approvalStatementEnum.getValue());

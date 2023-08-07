@@ -13,7 +13,6 @@ import java.util.UUID;
 
 @Data
 public class Invoice {
-    private int invoiceNumber;
     private int unitPrice;
     private int TotalPrice;
     private int kdvAddedTotalPrice;

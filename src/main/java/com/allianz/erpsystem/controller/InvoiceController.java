@@ -30,18 +30,9 @@ public class InvoiceController {
     InvoiceService invoiceService;
 
 
-    public ResponseEntity<InvoiceEntity> createInvoice(@RequestBody InvoiceEntity invoiceEntity) {
-        InvoiceEntity invoice1 = invoiceService.createInvoice(
-                invoiceEntity.getTotalPrice(), invoiceEntity.getKdvAddedTotalPrice(),invoiceEntity.getOrderEntity(),
-                invoiceEntity.getProductEntity());
-
-        return new ResponseEntity<>(invoice1, HttpStatus.CREATED);
-
-    }
-
-    @GetMapping("get-invoice-by-invoice-number/{invoiceNumber}")
-    public  ResponseEntity<InvoiceEntity> getInvoice (@PathVariable String invoiceNumber) {
-        InvoiceEntity invoice1 = invoiceService.getInvoiceByInvoiceNumber(invoiceNumber);
+    @GetMapping("get-invoice-by-id/{id}")
+    public  ResponseEntity<InvoiceEntity> getInvoice(@PathVariable Long id) {
+        InvoiceEntity invoice1 = invoiceService.getInvoiceById(id);
         return new ResponseEntity<>(invoice1, HttpStatus.OK);
 
 

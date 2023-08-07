@@ -12,7 +12,6 @@ public class Customer {
 
     private String customerName;
     private String customerAddress;
-    private int customerNumber;
     private UUID uuid;
 
     @OneToMany(targetEntity = Product.class,cascade = CascadeType.ALL)

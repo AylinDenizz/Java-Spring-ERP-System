@@ -21,14 +21,9 @@ public class CustomerService {
     CustomerRepository customerRepository;
 
     // random unique Customer number is created
-    private AtomicLong customerNumberGenerator = new AtomicLong(0);
 
-    public int generateUniqueCustomerNumber() {
-        return (int) customerNumberGenerator.incrementAndGet();
-    }
 
     public CustomerEntity createCustomer(String customerName, String customerAddress) {
-        String newCustomerNumber = "CUS" + generateUniqueCustomerNumber();
 
         CustomerEntity customer = new CustomerEntity();
         customer.setCustomerName(customerName);
@@ -38,8 +33,6 @@ public class CustomerService {
         }else {
             customer.setOrderCount(0);
         }
-        customer.setCustomerNumber(newCustomerNumber);
-
         customerRepository.save(customer);
         return customer;
 
@@ -56,8 +49,8 @@ public class CustomerService {
         }
     }
 
-    public CustomerEntity getCustomerByCustomerNumber(String customerNumber) {
-        Optional<CustomerEntity> customerEntityOptional = customerRepository.findCustomerEntityByCustomerNumber(customerNumber);
+    public CustomerEntity getCustomerById(Long id) {
+        Optional<CustomerEntity> customerEntityOptional = customerRepository.findCustomerEntityById(id);
         if (customerEntityOptional.isPresent()) {
             return customerEntityOptional.get();
         } else {
@@ -67,11 +60,11 @@ public class CustomerService {
 
 
     @Transactional
-    public Boolean deleteCustomerByCustomerNumber(String customerNumber) {
-        CustomerEntity customerEntity = getCustomerByCustomerNumber(customerNumber);
+    public Boolean deleteCustomerByCustomerNumber(Long id) {
+        CustomerEntity customerEntity = getCustomerById(id);
 
         if (customerEntity != null) {
-            customerRepository.deleteCustomerEntityByCustomerNumber(customerNumber);
+            customerRepository.deleteCustomerEntityById(id);
             return true;
         } else {
             return false;

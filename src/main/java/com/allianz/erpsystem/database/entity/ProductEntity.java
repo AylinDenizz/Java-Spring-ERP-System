@@ -1,6 +1,7 @@
 package com.allianz.erpsystem.database.entity;
 
 import com.allianz.erpsystem.util.dbutil.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -18,8 +19,6 @@ import java.math.BigDecimal;
 public class ProductEntity extends BaseEntity {
 
     @Column
-    private String productNumber;
-    @Column
     private String productType;
     @Column
     private String productName;
@@ -28,7 +27,7 @@ public class ProductEntity extends BaseEntity {
     @Column
     private BigDecimal unitPrice;
 
-    @ManyToOne
+    @ManyToOne(targetEntity = OrderEntity.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private OrderEntity orderEntity;
 
 

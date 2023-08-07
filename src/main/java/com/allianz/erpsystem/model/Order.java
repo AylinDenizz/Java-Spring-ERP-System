@@ -14,7 +14,6 @@ public class Order {
 
     private int orderAmount;
     private UUID uuid;
-    private int orderNumber;
     private Map<String, Double> kdvSettings = null;
 
 

@@ -1,26 +1,15 @@
 package com.allianz.erpsystem.controller;
 
-import com.allianz.erpsystem.database.entity.OrderEntity;
 import com.allianz.erpsystem.database.entity.ProductEntity;
-import com.allianz.erpsystem.database.repository.CustomerRepository;
 import com.allianz.erpsystem.database.repository.ProductRepository;
-import com.allianz.erpsystem.model.Customer;
-import com.allianz.erpsystem.model.Product;
 import com.allianz.erpsystem.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.sound.sampled.AudioSystem;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @RequestMapping("product")
@@ -43,16 +32,15 @@ public class ProductController {
     }
 
     @GetMapping("product-get-by-product-number/{productNumber}")
-    public ResponseEntity<ProductEntity> getProductByProductNumber(@PathVariable String productNumber) {
-        ProductEntity productEntity1 = productService.getProductByProductNumber(productNumber);
+    public ResponseEntity<ProductEntity> getProductById(@PathVariable Long id) {
+        ProductEntity productEntity1 = productService.getProductById(id);
         return new ResponseEntity<>(productEntity1, HttpStatus.OK);
     }
 
     @PutMapping("update-product-by-product-name/{productNumber}")
-    public ResponseEntity<ProductEntity> updateProductByProductName(@PathVariable String productNumber,
+    public ResponseEntity<ProductEntity> updateProductById(@PathVariable Long id,
                                                             @RequestBody ProductEntity newProductEntity) {
-        ProductEntity productEntity1 = productService.getProductByProductNumber(productNumber);
-        productEntity1.setProductNumber(newProductEntity.getProductNumber());
+        ProductEntity productEntity1 = productService.getProductById(id);
         productEntity1.setProductName(newProductEntity.getProductName());
         productEntity1.setProductType(newProductEntity.getProductType());
         productEntity1.setStockAmount(newProductEntity.getStockAmount());
@@ -62,11 +50,11 @@ public class ProductController {
 
     }
 
-    @PutMapping("update-product-price/{productNumber}")
-    public ResponseEntity<ProductEntity> updateProductPrice(@PathVariable String productNumber,
+    @PutMapping("update-product-price-by-id/{id}")
+    public ResponseEntity<ProductEntity> updateProductPriceById(@PathVariable Long id,
                                                             @RequestBody BigDecimal productPrice) {
 
-        ProductEntity productEntity1 = productService.getProductByProductNumber(productNumber);
+        ProductEntity productEntity1 = productService.getProductById(id);
         if (productEntity1 != null) {
         productEntity1.setUnitPrice(productPrice);
         productService.updateProduct(productEntity1);
@@ -77,11 +65,13 @@ public class ProductController {
 
     }
 
-    @Transactional
-    @DeleteMapping("product-delete-by-product-number/{productNumber}")
-    public ResponseEntity<Boolean> deleteProductByProductNumber(@PathVariable String productNumber) {
 
-        Boolean isDeleted = productService.deleteProductByProductNumber(productNumber);
+
+    @Transactional
+    @DeleteMapping("product-delete-by-id/{id}")
+    public ResponseEntity<Boolean> deleteProductById(@PathVariable Long id) {
+
+        Boolean isDeleted = productService.deleteProductById(id);
         if (isDeleted) {
             return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
 

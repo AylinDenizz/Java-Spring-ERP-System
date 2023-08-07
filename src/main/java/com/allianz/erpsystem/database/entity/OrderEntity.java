@@ -23,23 +23,18 @@ import java.util.*;
 public class OrderEntity extends BaseEntity {
     @Column
     private int orderAmount;
-    @Column
-    private String orderNumber;
 
     @ManyToOne
-    @PrimaryKeyJoinColumn
     @JoinColumn(name = "customer_id")
-    @JsonIgnore
     private CustomerEntity customerEntity;
 
 
     @OneToOne
-    @PrimaryKeyJoinColumn
     @JoinColumn(name = "invoice_id")
     private InvoiceEntity invoiceEntity;
 
     @Column
-    @OneToMany(targetEntity = ProductEntity.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(targetEntity = ProductEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "product_id")
     private List<ProductEntity> productEntities;
 

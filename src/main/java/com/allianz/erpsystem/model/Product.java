@@ -8,7 +8,6 @@ import java.util.UUID;
 @Data
 public class Product {
 
-    private int productNumber;
     private String productType;
     private String productName;
     private int stockAmount;

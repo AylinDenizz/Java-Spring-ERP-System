@@ -24,20 +24,16 @@ import java.util.UUID;
 public class InvoiceEntity extends BaseEntity {
 
     @Column
-    private String invoiceNumber;
-    @Column
     private BigDecimal TotalPrice;
     @Column
     private BigDecimal kdvAddedTotalPrice;
 
     @OneToOne
-    @PrimaryKeyJoinColumn
     private OrderEntity orderEntity;
 
 
     @Column
     @OneToMany(targetEntity = ProductEntity.class,cascade = CascadeType.ALL)
-    @JsonIgnore
     @JoinColumn(name = "product_id")
     private List<ProductEntity> productEntity;
 }
