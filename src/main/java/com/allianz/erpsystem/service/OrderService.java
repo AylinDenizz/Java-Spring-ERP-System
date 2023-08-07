@@ -48,18 +48,15 @@ public class OrderService {
     }
 
     public OrderEntity getOrderByOrderNumber(String orderNumber) {
-        Optional<OrderEntity> orderEntityOptional = orderRepository.findByOrderNumber(orderNumber);
-        Optional<OrderEntity> orderEntityOptional2 = orderRepository.findOrderEntitiesByOrderNumber(orderNumber);
         Optional<OrderEntity> orderEntityOptional3= orderRepository.findOrderEntityByOrderNumber(orderNumber);
-        System.out.println(orderEntityOptional.get().toString());
-        System.out.println(orderEntityOptional2.get().toString());
-        System.out.println(orderEntityOptional3.get().toString());
+
+
 
 
 
 
         if (orderEntityOptional3.isPresent()) {
-            return orderEntityOptional.get();
+            return orderEntityOptional3.get();
         } else {
             return null;
         }
@@ -80,6 +77,9 @@ public class OrderService {
 
         }
     }
+
+
+
 
 
 }

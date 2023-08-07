@@ -12,4 +12,7 @@ import java.util.Optional;
 public interface InvoiceRepository extends JpaRepository<InvoiceEntity, Long> {
 
     Optional<InvoiceEntity> findInvoiceEntityByOrderEntity(OrderEntity orderEntity);
+
+    Optional<InvoiceEntity> findInvoiceEntityByInvoiceNumber(String key);
+
 }

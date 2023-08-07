@@ -46,6 +46,13 @@ public class OrderController {
     @Autowired
     ProductService productService;
 
+    @GetMapping("get-order-by-order-number/{orderNumber}")
+    public ResponseEntity<OrderEntity> getOrder(@PathVariable String orderNumber) {
+        OrderEntity order1 = orderService.getOrderByOrderNumber(orderNumber);
+        return new ResponseEntity<>(order1, HttpStatus.OK);
+
+    }
+
 
     @PostMapping("make-an-order")
     public ResponseEntity<OrderEntity> createOrder(@RequestBody OrderRequestDTO orderRequest) {
@@ -54,33 +61,31 @@ public class OrderController {
         String customerNumber = orderRequest.getCustomerNumber();
         List<String> productNumbers = orderRequest.getProductNumbers();
 
+
         CustomerEntity customer = customerService.getCustomerByCustomerNumber(customerNumber);
 
         List<ProductEntity> productEntityList = new ArrayList<>();
 
         for (String productNumber : productNumbers) {
-            ProductEntity product =  productService.getProductByProductNumber(productNumber);
+            ProductEntity product = productService.getProductByProductNumber(productNumber);
             productEntityList.add(product);
         }
 
         if (productEntityList != null) {
             //  try {
             OrderEntity order1 = orderService.createOrder(orderAmount,
-                    customer, ApprovalStatementEnum.PENDING.getValue(),
+                    customer, 1,
                     productEntityList);
 
             System.out.println(order1);
             customerService.addOrderToCustomer(order1, customer);
 
-           return new ResponseEntity<>(order1, HttpStatus.CREATED);
+            return new ResponseEntity<>(order1, HttpStatus.CREATED);
 
         }
 
-        return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
-
-
-
 
 
     @PutMapping("approve-order-and-create-invoice/{orderNumber}")
@@ -88,6 +93,8 @@ public class OrderController {
         // getting order by orderNumber and update it's approval statement.
 
         OrderEntity orderEntity1 = orderService.getOrderByOrderNumber(orderNumber);
+
+        InvoiceEntity invoice1 = new InvoiceEntity();
 
         //ApprovalStatementEnum.PENDİNG => 1
         //ApprovalStatementEnum.APPROVED => 2
@@ -129,37 +136,40 @@ public class OrderController {
                 } else {
                     orderService.approvalStatementChangeOrder(orderEntity1, ApprovalStatementEnum.APPROVED);
                     product.setStockAmount(product.getStockAmount() - orderEntity1.getOrderAmount());
+
+
+                    // created a model to calculate kdv settings.
+                    Order order1 = new Order();
+                    Double kdvValue = 0.0;
+
+                    totalPrice = totalPrice.add(product.getUnitPrice());
+                    if (product.getProductType() == "food") {
+                        kdvValue = order1.getKdvSetting("kdv1");
+                    } else if (product.getProductType() == "electronics") {
+                        kdvValue = order1.getKdvSetting("kdv18");
+                    } else if (product.getProductType() == "services") {
+                        kdvValue = order1.getKdvSetting("kdv8");
+                    } else {
+                        System.out.println("please choose a product type as food, electronics or services");
+                        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+                    }
+                    kdvAddedTotalPrice.add(product.getUnitPrice());
+                    kdvAddedTotalPrice.add(product.getUnitPrice().multiply(new BigDecimal(kdvValue).
+                            divide(new BigDecimal(100))));
                 }
 
-                // created a model to calculate kdv settings.
-                Order order1 = new Order();
-                Double kdvValue = 0.0;
 
-                totalPrice = totalPrice.add(product.getUnitPrice());
-                if (product.getProductType() == "food") {
-                    kdvValue = order1.getKdvSetting("kdv1");
-                } else if (product.getProductType() == "electronics") {
-                    kdvValue = order1.getKdvSetting("kdv18");
-                } else if (product.getProductType() == "services") {
-                    kdvValue = order1.getKdvSetting("kdv8");
-                } else {
-                    System.out.println("please choose a product type as food, electronics or services");
-                    return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-                }
-                kdvAddedTotalPrice.add(product.getUnitPrice());
-                kdvAddedTotalPrice.add(product.getUnitPrice().multiply(new BigDecimal(kdvValue).
-                        divide(new BigDecimal(100))));
+                // If the order status is "Approved" here, a new invoice will be created.
+                invoice1 = invoiceService.createInvoice(totalPrice, kdvAddedTotalPrice,
+                        orderEntity1, orderEntity1.getProductEntities());
+                orderEntity1.setInvoiceEntity(invoice1);
+                System.out.println("Invoice has been created");
+                return new ResponseEntity<>(invoice1, HttpStatus.CREATED);
             }
-
-
-            // If the order status is "Approved" here, a new invoice will be created.
-            InvoiceEntity invoice1 = invoiceService.createInvoice(totalPrice, kdvAddedTotalPrice,
-                    orderEntity1, orderEntity1.getProductEntities());
-            orderEntity1.setInvoiceEntity(invoice1);
-            System.out.println("Invoice has been created");
             return new ResponseEntity<>(invoice1, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(invoice1, HttpStatus.CREATED);
+
     }
 // update metotu oluşturulacak ve kargoda veya satış tamamlandı aşamaları güncellenebilecek. Ama diğer şeyler değiştirilemeyecek.
 

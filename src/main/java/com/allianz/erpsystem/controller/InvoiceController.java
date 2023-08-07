@@ -11,9 +11,7 @@ import com.allianz.erpsystem.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -32,12 +30,20 @@ public class InvoiceController {
     InvoiceService invoiceService;
 
 
-    public ResponseEntity<InvoiceEntity> createProduct(@RequestBody InvoiceEntity invoiceEntity) {
+    public ResponseEntity<InvoiceEntity> createInvoice(@RequestBody InvoiceEntity invoiceEntity) {
         InvoiceEntity invoice1 = invoiceService.createInvoice(
                 invoiceEntity.getTotalPrice(), invoiceEntity.getKdvAddedTotalPrice(),invoiceEntity.getOrderEntity(),
                 invoiceEntity.getProductEntity());
 
         return new ResponseEntity<>(invoice1, HttpStatus.CREATED);
+
+    }
+
+    @GetMapping("get-invoice-by-invoice-number/{invoiceNumber}")
+    public  ResponseEntity<InvoiceEntity> getInvoice (@PathVariable String invoiceNumber) {
+        InvoiceEntity invoice1 = invoiceService.getInvoiceByInvoiceNumber(invoiceNumber);
+        return new ResponseEntity<>(invoice1, HttpStatus.OK);
+
 
     }
 

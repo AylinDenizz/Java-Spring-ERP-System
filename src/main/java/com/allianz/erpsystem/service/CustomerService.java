@@ -21,7 +21,7 @@ public class CustomerService {
     CustomerRepository customerRepository;
 
     // random unique Customer number is created
-    private static final AtomicLong customerNumberGenerator = new AtomicLong(0);
+    private AtomicLong customerNumberGenerator = new AtomicLong(0);
 
     public int generateUniqueCustomerNumber() {
         return (int) customerNumberGenerator.incrementAndGet();

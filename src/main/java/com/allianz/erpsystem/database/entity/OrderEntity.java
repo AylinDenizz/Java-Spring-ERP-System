@@ -5,6 +5,7 @@ import com.allianz.erpsystem.model.Customer;
 import com.allianz.erpsystem.model.Invoice;
 import com.allianz.erpsystem.model.Product;
 import com.allianz.erpsystem.util.dbutil.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -28,6 +29,7 @@ public class OrderEntity extends BaseEntity {
     @ManyToOne
     @PrimaryKeyJoinColumn
     @JoinColumn(name = "customer_id")
+    @JsonIgnore
     private CustomerEntity customerEntity;
 
 
@@ -37,7 +39,7 @@ public class OrderEntity extends BaseEntity {
     private InvoiceEntity invoiceEntity;
 
     @Column
-    @OneToMany
+    @OneToMany(targetEntity = ProductEntity.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "product_id")
     private List<ProductEntity> productEntities;
 

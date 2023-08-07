@@ -3,6 +3,7 @@ package com.allianz.erpsystem.database.entity;
 import com.allianz.erpsystem.model.Order;
 import com.allianz.erpsystem.model.Product;
 import com.allianz.erpsystem.util.dbutil.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -31,6 +32,7 @@ public class CustomerEntity extends BaseEntity {
 
     @Column
     @OneToMany(targetEntity =OrderEntity.class, cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<OrderEntity> orderEntities = null;
 
 

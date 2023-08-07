@@ -32,7 +32,7 @@ public class InvoiceService {
         return (int) invoiceNumberGenerator.incrementAndGet();
     }
 
-    public InvoiceEntity createInvoice( BigDecimal totalPrice, BigDecimal kdvAddedTotalPrice,
+    public InvoiceEntity createInvoice(BigDecimal totalPrice, BigDecimal kdvAddedTotalPrice,
                                        OrderEntity orderEntity, List<ProductEntity> productEntities) {
 
         String newInvoiceNumber = "INV" + generateUniqueInvoiceNumber();
@@ -51,6 +51,15 @@ public class InvoiceService {
 
     public InvoiceEntity getInvoiceByOrderEntity(OrderEntity orderEntity) {
         Optional<InvoiceEntity> invoiceEntityOptional = invoiceRepository.findInvoiceEntityByOrderEntity(orderEntity);
+        if (invoiceEntityOptional.isPresent()) {
+            return invoiceEntityOptional.get();
+        } else {
+            return null;
+        }
+    }
+
+    public InvoiceEntity getInvoiceByInvoiceNumber(String invoiceNumber) {
+        Optional<InvoiceEntity> invoiceEntityOptional = invoiceRepository.findInvoiceEntityByInvoiceNumber(invoiceNumber);
         if (invoiceEntityOptional.isPresent()) {
             return invoiceEntityOptional.get();
         } else {
