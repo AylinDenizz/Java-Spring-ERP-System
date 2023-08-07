@@ -30,17 +30,15 @@ public class InvoiceService {
 
 
     public InvoiceEntity createInvoice(BigDecimal totalPrice, BigDecimal kdvAddedTotalPrice,
-                                       OrderEntity orderEntity, List<ProductEntity> productEntities) {
+                                       OrderEntity orderEntity ) {
 
 
         InvoiceEntity invoice = new InvoiceEntity();
         invoice.setOrderEntity(orderEntity);
-        invoice.setProductEntity(productEntities);
         invoice.setTotalPrice(totalPrice);
         invoice.setKdvAddedTotalPrice(kdvAddedTotalPrice);
-
-
         invoiceRepository.save(invoice);
+
         return invoice;
     }
 

@@ -30,8 +30,7 @@ public class CustomerEntity extends BaseEntity {
     private int orderCount;
 
     @Column
-    @OneToMany(mappedBy = "customerEntity" ,targetEntity =OrderEntity.class, cascade = CascadeType.ALL)
-    @JsonIgnore
+    @OneToMany(mappedBy = "customerEntity" ,targetEntity =OrderEntity.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderEntity> orderEntities = null;
 
 

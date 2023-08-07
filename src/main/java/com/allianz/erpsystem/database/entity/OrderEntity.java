@@ -24,8 +24,9 @@ public class OrderEntity extends BaseEntity {
     @Column
     private int orderAmount;
 
-    @ManyToOne
+    @ManyToOne(targetEntity = CustomerEntity.class)
     @JoinColumn(name = "customer_id")
+    @JsonIgnore
     private CustomerEntity customerEntity;
 
 
@@ -34,7 +35,7 @@ public class OrderEntity extends BaseEntity {
     private InvoiceEntity invoiceEntity;
 
     @Column
-    @OneToMany(targetEntity = ProductEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(targetEntity = ProductEntity.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
     private List<ProductEntity> productEntities;
 

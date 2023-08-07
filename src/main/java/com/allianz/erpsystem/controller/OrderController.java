@@ -70,101 +70,74 @@ public class OrderController {
             OrderEntity order1 = orderService.createOrder(orderAmount,
                     customer, 1,
                     productEntityList);
-
-            System.out.println(order1);
             customerService.addOrderToCustomer(order1, customer);
 
             return new ResponseEntity<>(order1, HttpStatus.CREATED);
 
+        } else {
+            System.out.println("there is no product entity");
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
 
     @PutMapping("approve-order-and-create-invoice/by-id/{id}")
     public ResponseEntity<InvoiceEntity> approveOrderAndCreateInvoice(@PathVariable Long id) {
-        // getting order by orderNumber and update it's approval statement.
+        OrderEntity orderEntity = orderService.getOrderById(id);
 
-        OrderEntity orderEntity1 = orderService.getOrderById(id);
-
-        InvoiceEntity invoice1 = new InvoiceEntity();
-
-        //ApprovalStatementEnum.PENDİNG => 1
-        //ApprovalStatementEnum.APPROVED => 2
-        //ApprovalStatementEnum.DECLINED => 3
-        //ApprovalStatementEnum.TRANSFERSTATE => 4
-        //ApprovalStatementEnum.SALE_COMPLETED => 5
-
-        if (orderEntity1.getApprovalStatement() == 3) {
-            System.out.println("Sorry, this order just denied. Please make another order.");
+        if (orderEntity.getApprovalStatement() == 3) {
+            System.out.println("Sorry, this order has been declined. Please place another order.");
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } else if (orderEntity.getApprovalStatement() == 4 || orderEntity.getApprovalStatement() == 5) {
+            System.out.println("This order is already in transfer or registered. Here is the product invoice.");
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } else if (orderEntity.getApprovalStatement() == 1) {
+            BigDecimal totalPrice = BigDecimal.ZERO;
+            BigDecimal kdvAddedTotalPrice = BigDecimal.ZERO;
 
-        } else if (orderEntity1.getApprovalStatement() == 4) {
-            System.out.println("This order already in Transfer. Here this is product invoice");
+            List<ProductEntity> productEntities = orderEntity.getProductEntities();
+            Order orderModel = new Order();
 
-            //  return new ResponseEntity<>(null, HttpStatus.NOT_FOUND); // already created invoice will find.
-        } else if (orderEntity1.getApprovalStatement() == 5) {
-            System.out.println("This order already registered. Here this is product invoice");
-
-            //  return new ResponseEntity<>(null, HttpStatus.NOT_FOUND); // already created invoice will find.
-        } else if (orderEntity1.getApprovalStatement() == 1) {
-
-            //total price and tax rate added.
-            BigDecimal totalPrice = new BigDecimal(0);
-            BigDecimal kdvAddedTotalPrice = new BigDecimal(0);
-            List<ProductEntity> productEntities = orderEntity1.getProductEntities();
-
-            // created a loop for calculate kdv settings and check for stock amount for all products.
             for (ProductEntity product : productEntities) {
-
-                /* in this row, it is examined the stock amount of product. If there is enough product,
-                 the product stock amount decresed as the order amount.
-                */
-                if (product.getStockAmount() <= orderEntity1.getOrderAmount()) {
+                if (product.getStockAmount() < orderEntity.getOrderAmount()) {
                     System.out.println("Product stock is not enough");
-                    orderService.approvalStatementChangeOrder(orderEntity1, ApprovalStatementEnum.DECLINED);
+                    orderService.approvalStatementChangeOrder(orderEntity, ApprovalStatementEnum.DECLINED);
                     return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
                 } else {
-                    orderService.approvalStatementChangeOrder(orderEntity1, ApprovalStatementEnum.APPROVED);
-                    product.setStockAmount(product.getStockAmount() - orderEntity1.getOrderAmount());
 
+                    BigDecimal productUnitPrice = product.getUnitPrice();
+                    totalPrice = totalPrice.add(productUnitPrice);
 
-                    // created a model to calculate kdv settings.
-                    Order order1 = new Order();
-                    Double kdvValue = 0.0;
-
-                    totalPrice = totalPrice.add(product.getUnitPrice());
-                    if (product.getProductType() == "food") {
-                        kdvValue = order1.getKdvSetting("kdv1");
-                    } else if (product.getProductType() == "electronics") {
-                        kdvValue = order1.getKdvSetting("kdv18");
-                    } else if (product.getProductType() == "services") {
-                        kdvValue = order1.getKdvSetting("kdv8");
-                    } else {
-                        System.out.println("please choose a product type as food, electronics or services");
-                        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+                    double kdvValue = 0.0;
+                    if ("food".equals(product.getProductType())) {
+                        kdvValue = orderModel.getKdvSetting("kdv1");
+                    } else if ("electronics".equals(product.getProductType())) {
+                        kdvValue = orderModel.getKdvSetting("kdv18");
+                    } else if ("services".equals(product.getProductType())) {
+                        kdvValue = orderModel.getKdvSetting("kdv8");
                     }
-                    kdvAddedTotalPrice.add(product.getUnitPrice());
-                    kdvAddedTotalPrice.add(product.getUnitPrice().multiply(new BigDecimal(kdvValue).
-                            divide(new BigDecimal(100))));
+
+                    BigDecimal kdvAmount = productUnitPrice.multiply(BigDecimal.valueOf(kdvValue / 100));
+                    kdvAddedTotalPrice = kdvAddedTotalPrice.add(productUnitPrice).add(kdvAmount);
+
+                    product.setStockAmount(product.getStockAmount() - orderEntity.getOrderAmount());
                 }
 
-                orderService.approvalStatementChangeOrder(orderEntity1, ApprovalStatementEnum.APPROVED);
+                orderService.approvalStatementChangeOrder(orderEntity, ApprovalStatementEnum.APPROVED);
+                InvoiceEntity invoice = invoiceService.createInvoice(totalPrice, kdvAddedTotalPrice,
+                        orderEntity);
+                orderEntity.setInvoiceEntity(invoice);
 
-
-                // If the order status is "Approved" here, a new invoice will be created.
-                invoice1 = invoiceService.createInvoice(totalPrice, kdvAddedTotalPrice,
-                        orderEntity1, orderEntity1.getProductEntities());
-                orderEntity1.setInvoiceEntity(invoice1);
                 System.out.println("Invoice has been created");
-                return new ResponseEntity<>(invoice1, HttpStatus.CREATED);
+                return new ResponseEntity<>(invoice, HttpStatus.CREATED);
             }
-            return new ResponseEntity<>(invoice1, HttpStatus.CREATED);
-        }
-        return new ResponseEntity<>(invoice1, HttpStatus.CREATED);
 
+        }
+        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
+
+
 // update metotu oluşturulacak ve kargoda veya satış tamamlandı aşamaları güncellenebilecek. Ama diğer şeyler değiştirilemeyecek.
 
     @PutMapping("make-sale-completed-by-id/{id}")

@@ -28,12 +28,8 @@ public class InvoiceEntity extends BaseEntity {
     @Column
     private BigDecimal kdvAddedTotalPrice;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private OrderEntity orderEntity;
 
-
-    @Column
-    @OneToMany(targetEntity = ProductEntity.class,cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_id")
-    private List<ProductEntity> productEntity;
 }
